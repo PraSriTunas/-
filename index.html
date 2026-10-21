@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>华文识字 – 职业 Kosa Kata Pekerjaan</title>
+  <style>
+    :root {
+      --primary-color: #FF7675;
+      --secondary-color: #74B9FF;
+      --accent-color: #00CEC9;
+      --bg-color: #FFF5F5;
+      --card-bg: #FFFFFF;
+      --text-color: #2D3436;
+      --border-radius: 24px;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Comic Sans MS', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      background: linear-gradient(135deg, #FF7675, #FAB1A0);
+      color: white;
+      padding: 16px 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+
+    .lang-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 2px;
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: normal;
+      opacity: 0.95;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 500px;
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-weight: bold;
+      color: #636E72;
+      font-size: 0.95rem;
+    }
+
+    .progress-bg {
+      flex: 1;
+      height: 14px;
+      background: #DFE6E9;
+      border-radius: 10px;
+      margin: 0 12px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FF7675, #D63031);
+      width: 8.33%;
+      transition: width 0.3s ease;
+    }
+
+    /* 纯净卡片展示区 */
+    .card {
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 24px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      border: 4px solid #00CEC9;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card.speaking {
+      transform: scale(1.02);
+      box-shadow: 0 15px 35px rgba(0, 206, 201, 0.3);
+      border-color: #FF7675;
+    }
+
+    /* 图片容器 */
+    .img-box {
+      width: 100%;
+      height: 230px;
+      background: #F8F9FA;
+      border-radius: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border: 2px dashed #B2BEC3;
+    }
+
+    .card-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .default-icon {
+      font-size: 5.5rem;
+      user-select: none;
+    }
+
+    /* 文字展示区 */
+    .word-box {
+      margin: 18px 0 6px 0;
+      text-align: center;
+    }
+
+    .pinyin-text {
+      font-size: 1.3rem;
+      color: #0984E3;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .main-word {
+      font-size: 3.4rem;
+      font-weight: 800;
+      color: #2D3436;
+      letter-spacing: 2px;
+      line-height: 1.15;
+    }
+
+    .bm-text {
+      font-size: 1.15rem;
+      color: #636E72;
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    /* 朗读按钮 */
+    .audio-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #00CEC9, #81ECEC);
+      color: #2D3436;
+      border: none;
+      padding: 14px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 16px;
+      margin-top: 15px;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0, 206, 201, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.1s ease;
+    }
+
+    .audio-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* 翻页控制 */
+    .nav-controls {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .btn-nav {
+      flex: 1;
+      padding: 12px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-prev { background-color: #B2BEC3; color: white; }
+    .btn-next { background-color: #FF7675; color: white; }
+
+    /* 底部工具栏 */
+    .bottom-bar {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .btn-tool {
+      background: white;
+      border: 2px solid #DFE6E9;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      color: #2D3436;
+      cursor: pointer;
+    }
+
+    .toast-warning {
+      background-color: #FFEAA7;
+      color: #D63031;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      display: none;
+      text-align: center;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="lang-badge">华文 Bahasa Cina</div>
+    <h1>识字与词汇学习</h1>
+    <h2>主题：职业 (Pekerjaan)</h2>
+  </header>
+
+  <div id="toastWarning" class="toast-warning">
+    ⚠️ <strong>提示：</strong> 未找到标准华语发音引擎，系统将使用设备默认语音。
+  </div>
+
+  <div class="flashcard-wrapper">
+    
+    <div class="progress-bar-container">
+      <span id="cardIndex">1 / 12</span>
+      <div class="progress-bg">
+        <div id="progressBar" class="progress-fill"></div>
+      </div>
+      <span>生字卡片</span>
+    </div>
+
+    <!-- 1个图片 + 1个生字卡片 -->
+    <div class="card" id="mainCard">
+      
+      <!-- 图片显示区 -->
+      <div class="img-box">
+        <img id="cardImg" src="" alt="职业图片" class="card-img" style="display:none;" onerror="handleImageError()">
+        <div id="defaultIcon" class="default-icon">👩‍🏫</div>
+      </div>
+
+      <!-- 生字与拼音区 -->
+      <div class="word-box">
+        <div class="pinyin-text" id="pinyinText">lǎo shī</div>
+        <div class="main-word" id="wordText">老师</div>
+        <div class="bm-text" id="bmText">guru</div>
+      </div>
+
+      <button class="audio-btn" onclick="playCurrentWord()">
+        🔊 听发音 (Dengar Sebutan)
+      </button>
+
+    </div>
+
+    <div class="nav-controls">
+      <button class="btn-nav btn-prev" onclick="prevCard()">◀ 上一个</button>
+      <button class="btn-nav btn-next" onclick="nextCard()">下一个 ▶</button>
+    </div>
+
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn-tool" onclick="playAllSequence()">🔊 连续朗读全部</button>
+    <button class="btn-tool" onclick="stopSpeech()">⏸️ 停止</button>
+    <button class="btn-tool" onclick="testVoice()">📢 测试发音</button>
+    <button class="btn-tool" onclick="resetToFirst()">🔄 重新开始</button>
+  </div>
+
+  <script>
+    // 12 个职业词汇与对应的本地 PNG 文件名（以标准名称为准）
+    const vocabularyList = [
+      { id: 1, word: '老师', pinyin: 'lǎo shī', bm: 'guru', imgName: 'guru.png', emoji: '👩‍🏫' },
+      { id: 2, word: '医生', pinyin: 'yī shēng', bm: 'doktor', imgName: 'doktor.png', emoji: '👨‍⚕️' },
+      { id: 3, word: '护士', pinyin: 'hù shi', bm: 'jururawat', imgName: 'jururawat.png', emoji: '👩‍⚕️' },
+      { id: 4, word: '消防员', pinyin: 'xiāo fáng yuán', bm: 'ahli bomba', imgName: 'ahli_bomba.png', emoji: '👨‍🚒' },
+      { id: 5, word: '警察', pinyin: 'jǐng chá', bm: 'polis', imgName: 'polis.png', emoji: '👮‍♂️' },
+      { id: 6, word: '律师', pinyin: 'lǜ shī', bm: 'peguam', imgName: 'peguam.png', emoji: '⚖️' },
+      { id: 7, word: '法官', pinyin: 'fǎ guān', bm: 'hakim', imgName: 'hakim.png', emoji: '👨‍⚖️' },
+      { id: 8, word: '军人', pinyin: 'jūn rén', bm: 'tentera', imgName: 'tentera.png', emoji: '💂‍♂️' },
+      { id: 9, word: '飞行员', pinyin: 'fēi xíng yuán', bm: 'juruterbang', imgName: 'juruterbang.png', emoji: '👨‍✈️' },
+      { id: 10, word: '工程师', pinyin: 'gōng chéng shī', bm: 'jurutera', imgName: 'jurutera.png', emoji: '👷‍♂️' },
+      { id: 11, word: '渔夫', pinyin: 'yú fū', bm: 'nelayan', imgName: 'nelayan.png', emoji: '🎣' },
+      { id: 12, word: '农民', pinyin: 'nóng mín', bm: 'petani', imgName: 'petani.png', emoji: '👨‍🌾' }
+    ];
+
+    let currentIndex = 0;
+    let currentVoice = null;
+    let isPlayingAll = false;
+    let autoTimer = null;
+
+    function initVoices() {
+      if ('speechSynthesis' in window) {
+        const voices = speechSynthesis.getVoices();
+        currentVoice = voices.find(v => v.lang === 'zh-CN' || v.lang === 'zh_CN' || v.lang.startsWith('zh')) || null;
+        
+        const toast = document.getElementById('toastWarning');
+        if (!currentVoice && voices.length > 0) {
+          toast.style.display = 'block';
+        } else {
+          toast.style.display = 'none';
+        }
+      }
+    }
+
+    if ('speechSynthesis' in window) {
+      speechSynthesis.onvoiceschanged = initVoices;
+      initVoices();
+    }
+
+    function speak(text, onEndCallback = null) {
+      if (!('speechSynthesis' in window)) {
+        alert('您的浏览器不支持语音朗读功能。');
+        return;
+      }
+
+      speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.8;
+      utterance.pitch = 1.0;
+
+      if (currentVoice) {
+        utterance.voice = currentVoice;
+        utterance.lang = currentVoice.lang;
+      } else {
+        utterance.lang = 'zh-CN';
+      }
+
+      utterance.onend = () => { if (onEndCallback) onEndCallback(); };
+      utterance.onerror = () => { if (onEndCallback) onEndCallback(); };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function stopSpeech() {
+      isPlayingAll = false;
+      clearTimeout(autoTimer);
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+      }
+      document.getElementById('mainCard').classList.remove('speaking');
+    }
+
+    function testVoice() {
+      speak('小朋友好！我们一起来学习职业生字。');
+    }
+
+    function updateCardDisplay() {
+      const item = vocabularyList[currentIndex];
+
+      document.getElementById('pinyinText').innerText = item.pinyin;
+      document.getElementById('wordText').innerText = item.word;
+      document.getElementById('bmText').innerText = item.bm;
+      
+      document.getElementById('cardIndex').innerText = `${currentIndex + 1} / ${vocabularyList.length}`;
+      document.getElementById('progressBar').style.width = `${((currentIndex + 1) / vocabularyList.length) * 100}%`;
+
+      const imgEl = document.getElementById('cardImg');
+      const defaultIconEl = document.getElementById('defaultIcon');
+
+      // 优先从 images 文件夹读取，若无则尝试从根目录读取
+      imgEl.src = `./images/${item.imgName}`;
+      imgEl.style.display = 'block';
+      defaultIconEl.style.display = 'none';
+    }
+
+    function handleImageError() {
+      const imgEl = document.getElementById('cardImg');
+      const defaultIconEl = document.getElementById('defaultIcon');
+      const item = vocabularyList[currentIndex];
+
+      // 若从 images/ 目录读取失败，尝试直接从根目录读取同名 PNG
+      if (!imgEl.dataset.triedRoot) {
+        imgEl.dataset.triedRoot = "true";
+        imgEl.src = `./${item.imgName}`;
+        return;
+      }
+
+      // 若两次都未找到 PNG 文件，则展示备用 Emoji 图标
+      delete imgEl.dataset.triedRoot;
+      imgEl.style.display = 'none';
+      defaultIconEl.style.display = 'block';
+      defaultIconEl.innerText = item.emoji;
+    }
+
+    function playCurrentWord() {
+      stopSpeech();
+      const item = vocabularyList[currentIndex];
+      const card = document.getElementById('mainCard');
+      
+      card.classList.add('speaking');
+      speak(item.word, () => {
+        card.classList.remove('speaking');
+      });
+    }
+
+    function nextCard() {
+      stopSpeech();
+      if (currentIndex < vocabularyList.length - 1) {
+        currentIndex++;
+      } else {
+        currentIndex = 0;
+      }
+      updateCardDisplay();
+      playCurrentWord();
+    }
+
+    function prevCard() {
+      stopSpeech();
+      if (currentIndex > 0) {
+        currentIndex--;
+      } else {
+        currentIndex = vocabularyList.length - 1;
+      }
+      updateCardDisplay();
+      playCurrentWord();
+    }
+
+    function resetToFirst() {
+      stopSpeech();
+      currentIndex = 0;
+      updateCardDisplay();
+    }
+
+    function playAllSequence() {
+      stopSpeech();
+      isPlayingAll = true;
+      currentIndex = 0;
+      playSequenceStep();
+    }
+
+    function playSequenceStep() {
+      if (!isPlayingAll) return;
+
+      updateCardDisplay();
+      const item = vocabularyList[currentIndex];
+      const card = document.getElementById('mainCard');
+      
+      card.classList.add('speaking');
+
+      speak(item.word, () => {
+        card.classList.remove('speaking');
+        if (isPlayingAll) {
+          autoTimer = setTimeout(() => {
+            if (currentIndex < vocabularyList.length - 1) {
+              currentIndex++;
+              playSequenceStep();
+            } else {
+              isPlayingAll = false;
+              alert('太棒了！你已经学会了所有的职业生字！');
+            }
+          }, 1200);
+        }
+      });
+    }
+
+    // 初始化页面
+    updateCardDisplay();
+  </script>
+</body>
+</html>
